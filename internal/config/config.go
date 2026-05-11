@@ -249,21 +249,21 @@ type ExtraConfig struct {
 
 // Config holds the application configuration
 type Config struct {
-	Source       string                  `yaml:"source"`
-	AgentsSource string                  `yaml:"agents_source,omitempty"`
-	ExtrasSource string                  `yaml:"extras_source,omitempty"`
-	Mode         string                  `yaml:"mode,omitempty"` // default mode: merge
-	TargetNaming string                  `yaml:"target_naming,omitempty"`
-	Targets      map[string]TargetConfig `yaml:"targets"`
-	Extras       []ExtraConfig           `yaml:"extras,omitempty"`
-	Ignore       []string                `yaml:"ignore,omitempty"`
-	Audit        AuditConfig             `yaml:"audit,omitempty"`
-	Hub          HubConfig               `yaml:"hub,omitempty"`
-	Log          LogConfig               `yaml:"log,omitempty"`
-	ContextBudget ContextBudgetConfig    `yaml:"context_budget,omitempty"`
-	TUI          *bool                   `yaml:"tui,omitempty"` // nil = default true
-	GitLabHosts  []string                `yaml:"gitlab_hosts,omitempty"`
-	AzureHosts   []string                `yaml:"azure_hosts,omitempty"`
+	Source        string                  `yaml:"source"`
+	AgentsSource  string                  `yaml:"agents_source,omitempty"`
+	ExtrasSource  string                  `yaml:"extras_source,omitempty"`
+	Mode          string                  `yaml:"mode,omitempty"` // default mode: merge
+	TargetNaming  string                  `yaml:"target_naming,omitempty"`
+	Targets       map[string]TargetConfig `yaml:"targets"`
+	Extras        []ExtraConfig           `yaml:"extras,omitempty"`
+	Ignore        []string                `yaml:"ignore,omitempty"`
+	Audit         AuditConfig             `yaml:"audit,omitempty"`
+	Hub           HubConfig               `yaml:"hub,omitempty"`
+	Log           LogConfig               `yaml:"log,omitempty"`
+	ContextBudget ContextBudgetConfig     `yaml:"context_budget,omitempty"`
+	TUI           *bool                   `yaml:"tui,omitempty"` // nil = default true
+	GitLabHosts   []string                `yaml:"gitlab_hosts,omitempty"`
+	AzureHosts    []string                `yaml:"azure_hosts,omitempty"`
 
 	// RegistryDir is the resolved directory for registry.yaml (cached SourceRoot result).
 	// Set during Load(), not serialized to YAML.

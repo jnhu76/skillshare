@@ -255,14 +255,14 @@ func PruneStaleSkills(skills []SkillEntry, live map[string]bool, skillsOnly bool
 
 // ProjectConfig holds project-level config (.skillshare/config.yaml).
 type ProjectConfig struct {
-	Targets      []ProjectTargetEntry `yaml:"targets"`
-	TargetNaming string               `yaml:"target_naming,omitempty"`
-	Extras       []ExtraConfig        `yaml:"extras,omitempty"`
-	Audit        AuditConfig          `yaml:"audit,omitempty"`
-	ContextBudget ContextBudgetConfig `yaml:"context_budget,omitempty"`
-	Hub          HubConfig            `yaml:"hub,omitempty"`
-	GitLabHosts  []string             `yaml:"gitlab_hosts,omitempty"`
-	AzureHosts   []string             `yaml:"azure_hosts,omitempty"`
+	Targets       []ProjectTargetEntry `yaml:"targets"`
+	TargetNaming  string               `yaml:"target_naming,omitempty"`
+	Extras        []ExtraConfig        `yaml:"extras,omitempty"`
+	Audit         AuditConfig          `yaml:"audit,omitempty"`
+	ContextBudget ContextBudgetConfig  `yaml:"context_budget,omitempty"`
+	Hub           HubConfig            `yaml:"hub,omitempty"`
+	GitLabHosts   []string             `yaml:"gitlab_hosts,omitempty"`
+	AzureHosts    []string             `yaml:"azure_hosts,omitempty"`
 }
 
 // EffectiveGitLabHosts returns GitLabHosts merged with SKILLSHARE_GITLAB_HOSTS env var.
