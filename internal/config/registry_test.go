@@ -279,7 +279,8 @@ func TestSourceRoot_GitAtParent(t *testing.T) {
 	}
 }
 
-func TestMigrateProjectSkillsToRegistry(t *testing.T) {
+// Issue #157: LoadProject must preserve skills in config.yaml (no migration to registry).
+func TestProjectSkillsNotMigratedToRegistry(t *testing.T) {
 	root := t.TempDir()
 	skillshareDir := filepath.Join(root, ".skillshare")
 	if err := os.MkdirAll(skillshareDir, 0755); err != nil {
@@ -287,25 +288,27 @@ func TestMigrateProjectSkillsToRegistry(t *testing.T) {
 	}
 	configPath := filepath.Join(skillshareDir, "config.yaml")
 
-	// Write old-format project config with skills
 	oldConfig := "targets:\n  - claude\nskills:\n  - name: my-skill\n    source: github.com/user/repo\n"
 	if err := os.WriteFile(configPath, []byte(oldConfig), 0644); err != nil {
 		t.Fatal(err)
 	}
 
-	_, err := LoadProject(root)
+	cfg, err := LoadProject(root)
 	if err != nil {
 		t.Fatalf("LoadProject failed: %v", err)
 	}
 
-	reg, err := LoadRegistry(skillshareDir)
-	if err != nil {
-		t.Fatalf("LoadRegistry failed: %v", err)
+	// Skills should be in ProjectConfig, not migrated to registry.yaml
+	if len(cfg.Skills) != 1 {
+		t.Fatalf("expected 1 skill in ProjectConfig, got %d", len(cfg.Skills))
 	}
-	if len(reg.Skills) != 1 {
-		t.Fatalf("expected 1 skill in registry, got %d", len(reg.Skills))
+	if cfg.Skills[0].Name != "my-skill" {
+		t.Errorf("expected 'my-skill', got %q", cfg.Skills[0].Name)
 	}
-	if reg.Skills[0].Name != "my-skill" {
-		t.Errorf("expected 'my-skill', got %q", reg.Skills[0].Name)
+
+	// registry.yaml should NOT be created
+	registryPath := RegistryPath(skillshareDir)
+	if _, err := os.Stat(registryPath); err == nil {
+		t.Error("registry.yaml should not exist — skills stay in config.yaml")
 	}
 }

@@ -9,6 +9,25 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.19.12] - 2026-05-14
+
+### Bug Fixes
+
+- **Project `skills:` in config.yaml no longer stripped** — previously, project-mode commands silently removed the `skills:` section from `.skillshare/config.yaml` during an internal migration, leaving no committable record of remote skill dependencies. Now `skills:` stays in `config.yaml` as the declarative source of truth. Teammates can clone the repo and run `skillshare install -p` to install all listed skills. Refs: #157
+  ```yaml
+  # .skillshare/config.yaml — committed to git
+  targets:
+    - claude
+    - cursor
+  skills:
+    - name: pdf
+      source: anthropic/skills/pdf
+    - name: review
+      source: github.com/team/skills/code-review
+      group: frontend
+  ```
+  `skillshare install <source> -p` automatically adds the skill to `config.yaml`. `skillshare uninstall` removes it. Runtime metadata (hashes, timestamps) stays in `.metadata.json` (gitignored)
+
 ## [0.19.11] - 2026-05-14
 
 ### New Features

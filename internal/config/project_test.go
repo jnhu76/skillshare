@@ -3,8 +3,95 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
+
+// Issue #157: skills: section in config.yaml must survive LoadProject round-trip.
+func TestLoadProject_PreservesSkills(t *testing.T) {
+	root := t.TempDir()
+	skillshareDir := filepath.Join(root, ".skillshare")
+	if err := os.MkdirAll(skillshareDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	configYAML := `targets:
+  - claude
+skills:
+  - name: pdf
+    source: anthropic/skills/pdf
+  - name: next-best-practices
+    source: vercel-labs/next-skills/next-best-practices
+    group: frontend
+audit:
+  block_threshold: CRITICAL
+`
+	configPath := filepath.Join(skillshareDir, "config.yaml")
+	os.WriteFile(configPath, []byte(configYAML), 0644)
+
+	cfg, err := LoadProject(root)
+	if err != nil {
+		t.Fatalf("LoadProject failed: %v", err)
+	}
+
+	if len(cfg.Skills) != 2 {
+		t.Fatalf("expected 2 skills, got %d", len(cfg.Skills))
+	}
+	if cfg.Skills[0].Name != "pdf" {
+		t.Errorf("skills[0].Name = %q, want %q", cfg.Skills[0].Name, "pdf")
+	}
+	if cfg.Skills[0].Source != "anthropic/skills/pdf" {
+		t.Errorf("skills[0].Source = %q, want %q", cfg.Skills[0].Source, "anthropic/skills/pdf")
+	}
+	if cfg.Skills[1].Group != "frontend" {
+		t.Errorf("skills[1].Group = %q, want %q", cfg.Skills[1].Group, "frontend")
+	}
+
+	// Verify config.yaml on disk still contains skills: section
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), "skills:") {
+		t.Error("config.yaml on disk should still contain 'skills:' after LoadProject")
+	}
+}
+
+// Issue #157: skills survive Save → LoadProject round-trip.
+func TestProjectConfig_SkillsRoundTrip(t *testing.T) {
+	root := t.TempDir()
+	skillshareDir := filepath.Join(root, ".skillshare")
+	if err := os.MkdirAll(skillshareDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := &ProjectConfig{
+		Targets: []ProjectTargetEntry{{Name: "claude"}},
+		Skills: []SkillEntry{
+			{Name: "pdf", Source: "anthropic/skills/pdf"},
+			{Name: "my-tool", Source: "org/repo/my-tool", Tracked: true, Group: "tools"},
+		},
+	}
+
+	if err := cfg.Save(root); err != nil {
+		t.Fatalf("Save failed: %v", err)
+	}
+
+	loaded, err := LoadProject(root)
+	if err != nil {
+		t.Fatalf("LoadProject after Save failed: %v", err)
+	}
+
+	if len(loaded.Skills) != 2 {
+		t.Fatalf("expected 2 skills after round-trip, got %d", len(loaded.Skills))
+	}
+	if loaded.Skills[0].Name != "pdf" || loaded.Skills[0].Source != "anthropic/skills/pdf" {
+		t.Errorf("skills[0] mismatch: %+v", loaded.Skills[0])
+	}
+	if loaded.Skills[1].Tracked != true || loaded.Skills[1].Group != "tools" {
+		t.Errorf("skills[1] mismatch: %+v", loaded.Skills[1])
+	}
+}
 
 func TestLoadProject_ExtrasConfig(t *testing.T) {
 	root := t.TempDir()

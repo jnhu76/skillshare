@@ -161,6 +161,87 @@ func TestReconcileProjectSkills_NestedSkillSetsGroup(t *testing.T) {
 	}
 }
 
+// Issue #157: reconcile should add newly installed skill to ProjectConfig.Skills
+func TestReconcileProjectSkills_AddsToConfigSkills(t *testing.T) {
+	root := t.TempDir()
+	skillsDir := filepath.Join(root, ".skillshare", "skills")
+
+	skillPath := filepath.Join(skillsDir, "new-skill")
+	if err := os.MkdirAll(skillPath, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := &ProjectConfig{
+		Targets: []ProjectTargetEntry{{Name: "claude"}},
+	}
+	// Write initial config.yaml
+	if err := cfg.Save(root); err != nil {
+		t.Fatal(err)
+	}
+
+	store := install.NewMetadataStore()
+	store.Set("new-skill", &install.MetadataEntry{Source: "github.com/user/repo"})
+
+	if err := ReconcileProjectSkills(root, cfg, store, skillsDir); err != nil {
+		t.Fatalf("ReconcileProjectSkills failed: %v", err)
+	}
+
+	if len(cfg.Skills) != 1 {
+		t.Fatalf("expected 1 config skill, got %d", len(cfg.Skills))
+	}
+	if cfg.Skills[0].Name != "new-skill" {
+		t.Errorf("skill name = %q, want %q", cfg.Skills[0].Name, "new-skill")
+	}
+	if cfg.Skills[0].Source != "github.com/user/repo" {
+		t.Errorf("skill source = %q, want %q", cfg.Skills[0].Source, "github.com/user/repo")
+	}
+
+	// Verify config.yaml on disk has the skill
+	loaded, err := LoadProject(root)
+	if err != nil {
+		t.Fatalf("LoadProject failed: %v", err)
+	}
+	if len(loaded.Skills) != 1 {
+		t.Fatalf("expected 1 skill in loaded config, got %d", len(loaded.Skills))
+	}
+}
+
+// Issue #157: reconcile should remove config skills for uninstalled skills
+func TestReconcileProjectSkills_PrunesConfigSkills(t *testing.T) {
+	root := t.TempDir()
+	skillsDir := filepath.Join(root, ".skillshare", "skills")
+
+	// Only "alive" exists on disk
+	if err := os.MkdirAll(filepath.Join(skillsDir, "alive"), 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := &ProjectConfig{
+		Targets: []ProjectTargetEntry{{Name: "claude"}},
+		Skills: []SkillEntry{
+			{Name: "alive", Source: "github.com/user/alive"},
+			{Name: "gone", Source: "github.com/user/gone"},
+		},
+	}
+	if err := cfg.Save(root); err != nil {
+		t.Fatal(err)
+	}
+
+	store := install.NewMetadataStore()
+	store.Set("alive", &install.MetadataEntry{Source: "github.com/user/alive"})
+
+	if err := ReconcileProjectSkills(root, cfg, store, skillsDir); err != nil {
+		t.Fatalf("ReconcileProjectSkills failed: %v", err)
+	}
+
+	if len(cfg.Skills) != 1 {
+		t.Fatalf("expected 1 config skill after prune, got %d", len(cfg.Skills))
+	}
+	if cfg.Skills[0].Name != "alive" {
+		t.Errorf("remaining skill = %q, want %q", cfg.Skills[0].Name, "alive")
+	}
+}
+
 func TestReconcileProjectSkills_PrunesStaleEntries(t *testing.T) {
 	root := t.TempDir()
 	skillsDir := filepath.Join(root, ".skillshare", "skills")

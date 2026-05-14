@@ -66,7 +66,18 @@ type projectInstallContext struct {
 
 func (p *projectInstallContext) SourcePath() string { return p.runtime.sourcePath }
 func (p *projectInstallContext) ConfigSkills() []install.SkillEntryDTO {
-	return storeToSkillEntryDTOs(p.runtime.skillsStore)
+	skills := p.runtime.config.Skills
+	dtos := make([]install.SkillEntryDTO, 0, len(skills))
+	for _, s := range skills {
+		dtos = append(dtos, install.SkillEntryDTO{
+			Name:    s.Name,
+			Source:  s.Source,
+			Tracked: s.Tracked,
+			Group:   s.Group,
+			Branch:  s.Branch,
+		})
+	}
+	return dtos
 }
 func (p *projectInstallContext) Reconcile() error {
 	return reconcileProjectRemoteSkills(p.runtime)

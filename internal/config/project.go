@@ -256,6 +256,7 @@ func PruneStaleSkills(skills []SkillEntry, live map[string]bool, skillsOnly bool
 // ProjectConfig holds project-level config (.skillshare/config.yaml).
 type ProjectConfig struct {
 	Targets       []ProjectTargetEntry `yaml:"targets"`
+	Skills        []SkillEntry         `yaml:"skills,omitempty"`
 	TargetNaming  string               `yaml:"target_naming,omitempty"`
 	Extras        []ExtraConfig        `yaml:"extras,omitempty"`
 	Audit         AuditConfig          `yaml:"audit,omitempty"`
@@ -283,9 +284,6 @@ func ProjectConfigPath(projectRoot string) string {
 // LoadProject loads the project config from the given root.
 func LoadProject(projectRoot string) (*ProjectConfig, error) {
 	path := ProjectConfigPath(projectRoot)
-
-	// Migrate skills[] to registry.yaml (one-time, silent)
-	_ = migrateProjectSkillsToRegistry(path, projectRoot)
 
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -370,51 +368,6 @@ func (c *ProjectConfig) Save(projectRoot string) error {
 	}
 
 	return nil
-}
-
-// migrateProjectSkillsToRegistry extracts skills[] from project config.yaml into registry.yaml.
-// Uses raw YAML parsing because ProjectConfig struct no longer has a Skills field.
-func migrateProjectSkillsToRegistry(configPath, projectRoot string) error {
-	registryDir := filepath.Join(projectRoot, ".skillshare")
-	registryPath := RegistryPath(registryDir)
-
-	if _, err := os.Stat(registryPath); err == nil {
-		return nil
-	}
-
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		return nil
-	}
-
-	var legacy struct {
-		Skills []SkillEntry `yaml:"skills,omitempty"`
-	}
-	if err := yaml.Unmarshal(data, &legacy); err != nil {
-		return nil
-	}
-
-	if len(legacy.Skills) == 0 {
-		return nil
-	}
-
-	reg := &Registry{Skills: legacy.Skills}
-	if err := reg.Save(registryDir); err != nil {
-		return fmt.Errorf("failed to create registry.yaml during project migration: %w", err)
-	}
-
-	// Strip skills from project config.yaml
-	var raw map[string]any
-	if err := yaml.Unmarshal(data, &raw); err != nil {
-		return nil
-	}
-	delete(raw, "skills")
-	cleaned, err := marshalYAML(raw)
-	if err != nil {
-		return nil
-	}
-	cleaned = append(projectSchemaComment, cleaned...)
-	return os.WriteFile(configPath, cleaned, 0644)
 }
 
 // needsTargetMigration detects if a project config still uses legacy flat

@@ -29,6 +29,19 @@
         ]
       ]
     },
+    "skills": {
+      "type": "array",
+      "description": "Remote skills this project depends on. Committed with the project so teammates can run 'skillshare install -p' to install them all.",
+      "items": {
+        "$ref": "#/$defs/skillEntry"
+      },
+      "examples": [
+        [
+          { "name": "pdf", "source": "anthropic/skills/pdf" },
+          { "name": "next-best-practices", "source": "vercel-labs/next-skills/next-best-practices", "group": "frontend" }
+        ]
+      ]
+    },
     "audit": {
       "$ref": "#/$defs/auditConfig"
     },
@@ -72,6 +85,38 @@
     }
   },
   "$defs": {
+    "skillEntry": {
+      "type": "object",
+      "description": "A remote skill dependency. Declares which skill to install and where it comes from.",
+      "required": ["name", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Skill name (the directory name under .skillshare/skills/).",
+          "examples": ["pdf", "next-best-practices"]
+        },
+        "source": {
+          "type": "string",
+          "description": "Source path for installation (GitHub path, git URL, or local path).",
+          "examples": ["anthropic/skills/pdf", "vercel-labs/next-skills/next-best-practices"]
+        },
+        "tracked": {
+          "type": "boolean",
+          "description": "True if installed with --track (preserves git history).",
+          "default": false
+        },
+        "group": {
+          "type": "string",
+          "description": "Subdirectory group the skill belongs to (set by --into during install).",
+          "examples": ["frontend", "backend"]
+        },
+        "branch": {
+          "type": "string",
+          "description": "Git branch to clone from. Omit for remote default branch."
+        }
+      }
+    },
     "projectTargetEntry": {
       "oneOf": [
         {

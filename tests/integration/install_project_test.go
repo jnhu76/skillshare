@@ -101,6 +101,9 @@ func TestInstallProject_FromConfig_SkipsExisting(t *testing.T) {
 
 	sb.WriteProjectConfig(projectRoot, `targets:
   - claude
+skills:
+  - name: already-here
+    source: someone/skills/already-here
 `)
 
 	// install (no args) → should skip existing

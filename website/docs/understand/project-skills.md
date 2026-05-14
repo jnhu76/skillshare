@@ -20,7 +20,7 @@ Use project skills when your team needs repo-specific AI instructions (coding st
 | **Project tooling** | CI/CD deployment knowledge, testing patterns, migration scripts specific to this repo |
 | **Onboarding acceleration** | "How does auth work here?" — the AI already knows, from committed project skills |
 | **Open source projects** | Maintainers commit `.skillshare/` so contributors get project-specific AI context on clone |
-| **Community skill curation** | A repo's `.metadata.json` serves as a curated skill list — anyone can `install -p` to get the same setup |
+| **Community skill curation** | A repo's `config.yaml` `skills:` section serves as a curated skill list — anyone can `install -p` to get the same setup |
 
 ---
 
@@ -86,7 +86,7 @@ skillshare sync -g       # Force global mode
 <project-root>/
 ├── .skillshare/
 │   ├── config.yaml              # Targets + settings (incl. extras)
-│   ├── .metadata.json           # Remote skills list (auto-managed)
+│   ├── skills/.metadata.json     # Runtime metadata (hashes, timestamps — auto-managed, gitignored)
 │   ├── .gitignore               # Ignores logs/, trash/, backups/, and cloned remote/tracked skill dirs
 │   ├── extras/                  # Extras source directories
 │   │   └── rules/               # e.g. extras init rules --target .claude/rules -p
@@ -139,30 +139,33 @@ targets:
 - **Short**: Just the target name (e.g., `claude`). Uses known default path, merge mode.
 - **Long**: Object with `name`, optional `path`, optional `mode` (`merge`, `copy`, or `symlink`), and optional `include`/`exclude` filters. Supports relative paths (resolved from project root) and `~` expansion.
 
-Remote skill installations are tracked in a separate file, `.skillshare/.metadata.json`:
+Remote skill dependencies are declared in `config.yaml` under `skills:`:
 
-```json
-{
-  "skills": [
-    {
-      "name": "pdf-skill",
-      "source": "anthropic/skills/pdf"
-    },
-    {
-      "name": "_team-skills",
-      "source": "github.com/team/skills",
-      "tracked": true
-    }
-  ]
-}
+```yaml
+targets:
+  - claude
+  - cursor
+
+skills:
+  - name: pdf
+    source: anthropic/skills/pdf
+  - name: _team-skills
+    source: github.com/team/skills
+    tracked: true
+  - name: review
+    source: github.com/team/skills/code-review
+    group: frontend
 ```
 
-**Skills** list tracks remote installations only. Local skills don't need entries here.
+**Skills** list declares remote installations only. Local skills don't need entries here.
 
 - `tracked: true`: Installed with `--track` (git repo with `.git/` preserved). When someone runs `skillshare install -p`, tracked skills are cloned with full git history so `skillshare update` works correctly.
+- `group`: Subdirectory path (corresponds to `--into` during install).
+
+Runtime metadata (install timestamps, file hashes, commit SHAs) is stored separately in `.skillshare/skills/.metadata.json` — this file is auto-managed and gitignored.
 
 :::tip Portable Skill Manifest
-`config.yaml` and `.metadata.json` together form a portable skill manifest in both global and project mode. In a project, commit them to git and anyone can run `skillshare install -p && skillshare sync`. For global mode, copy both files to a new machine and run `skillshare install && skillshare sync`. This works for teams, open source contributors, community templates, and dotfiles across machines.
+`config.yaml` is the declarative skill manifest. In a project, commit it to git and anyone can run `skillshare install -p && skillshare sync`. For global mode, `.metadata.json` serves as the manifest since global config doesn't need to be shared via git.
 :::
 
 ---
