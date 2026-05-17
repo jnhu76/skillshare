@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.19.13] - 2026-05-17
+
+### Bug Fixes
+
+- **Tracked skills now retain custom name and branch from config** — previously, `skillshare update` on a tracked repo re-derived the directory name from the clone URL (e.g. `_owner-repo`), ignoring any custom `name:` set in `config.yaml`. Now the resolution priority is: `--name` flag > config `name:` > URL-derived name. Similarly, a non-default `branch:` in config is now respected during clone and update. Refs: #158
+
 ## [0.19.12] - 2026-05-14
 
 ### Bug Fixes
