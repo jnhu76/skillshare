@@ -308,6 +308,9 @@ func (c *ProjectConfig) EffectiveExtrasSource(projectRoot string) string {
 func ProjectGitignoreTarget(projectRoot, sourcePath string) (gitignoreDir, entryPrefix string) {
 	skillshareDir := filepath.Join(projectRoot, ".skillshare")
 	if rel, err := filepath.Rel(skillshareDir, sourcePath); err == nil && !strings.HasPrefix(rel, "..") {
+		if rel == "." {
+			return skillshareDir, ""
+		}
 		return skillshareDir, filepath.ToSlash(rel)
 	}
 	if rel, err := filepath.Rel(projectRoot, sourcePath); err == nil && !strings.HasPrefix(rel, "..") {

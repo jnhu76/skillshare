@@ -268,6 +268,18 @@ func TestProjectGitignoreTarget_UnderSkillshare(t *testing.T) {
 	}
 }
 
+func TestProjectGitignoreTarget_SkillshareRoot(t *testing.T) {
+	root := "/project"
+	source := filepath.Join(root, ".skillshare")
+	dir, prefix := ProjectGitignoreTarget(root, source)
+	if dir != filepath.Join(root, ".skillshare") {
+		t.Errorf("dir = %q, want .skillshare dir", dir)
+	}
+	if prefix != "" {
+		t.Errorf("prefix should be empty for source==.skillshare, got %q", prefix)
+	}
+}
+
 func TestProjectGitignoreTarget_InsideProject(t *testing.T) {
 	root := "/project"
 	source := filepath.Join(root, "docs", "skills")
