@@ -1,5 +1,17 @@
 # Feature Proposal: Custom Project Source Directories
 
+## Status
+
+**Shipped in v0.19.15** (2026-05-20). Issue [#153](https://github.com/runkids/skillshare/issues/153), PR [#162](https://github.com/runkids/skillshare/pull/162).
+
+What actually shipped:
+
+- `sources` map only — the `source:` shorthand from the original proposal was dropped to keep one canonical form. Use `sources.skills:` for the same effect.
+- All three keys (`sources.skills`, `sources.agents`, `sources.extras`) supported. Each is optional; omitted keys fall back to `.skillshare/<type>/`.
+- Defense-in-depth guards added during implementation: sync rejects source/target path overlap, gitignore management skips external paths, destructive project commands fail closed on malformed `config.yaml`.
+
+See [CHANGELOG.md](../CHANGELOG.md#01915---2026-05-20) and [project-skills docs](../website/docs/understand/project-skills.md#custom-source-directories).
+
 ## Problem
 
 Project mode currently treats `.skillshare/skills/` as the fixed source directory for project-scoped skills.
@@ -88,5 +100,7 @@ Expected areas:
 
 ## Open Questions
 
-- If a tracked skill repo is installed into a custom source outside `.skillshare/`, should skillshare update the project root `.gitignore`, or should it leave ignore rules entirely to the repository?
-- Should `skillshare init -p` gain a `--source` flag now, or should custom source setup remain an explicit config edit for this change?
+- **Resolved** — If a tracked skill repo is installed into a custom source outside `.skillshare/`, should skillshare update the project root `.gitignore`?
+  Decision: skillshare leaves ignore rules entirely to the repository. `ProjectGitignoreTarget` returns empty values for external paths and all callers skip gitignore management.
+- **Resolved** — Should `skillshare init -p` gain a `--source` flag now?
+  Decision: deferred. Custom source setup remains an explicit `config.yaml` edit. `init -p` still seeds the default `.skillshare/skills/` and `.skillshare/agents/` directories.
