@@ -170,6 +170,42 @@ Runtime metadata (install timestamps, file hashes, commit SHAs) is stored separa
 
 ---
 
+## Custom Source Directories
+
+By default, project mode reads skills, agents, and extras from `.skillshare/skills/`, `.skillshare/agents/`, and `.skillshare/extras/`. Override these paths with the optional `sources` map when you want to keep skill content alongside other project documentation:
+
+```yaml
+sources:
+  skills: ./docs/skills
+  agents: ./docs/agents
+  extras: ./docs/extras
+targets:
+  - claude
+```
+
+Each key is optional — omitting a key falls back to the default `.skillshare/<type>/` path. Paths are resolved relative to the project root, and absolute paths (including `~`) work too.
+
+**Common layouts:**
+
+```yaml
+# Co-locate skill content with existing project docs
+sources:
+  skills: ./docs/skills
+
+# Keep agents in an AI-focused subdirectory
+sources:
+  agents: ./ai/agents
+```
+
+**Constraints:**
+
+- **No alias with target paths.** `skillshare sync -p` rejects configs where a source resolves to the same directory as a target (or one contains the other). This prevents `sync --force` from wiping the configured source. For example, `sources.skills: .claude/skills` combined with a `claude` target is rejected with an `overlaps` error.
+- **External paths skip gitignore management.** When a source resolves outside the project root (an absolute path elsewhere on disk), skillshare does not add entries to the project's `.gitignore`. Manage ignore rules in the source directory yourself if needed.
+- **Operational dirs stay in `.skillshare/`.** Trash, backups, and operation logs always live under `.skillshare/` regardless of `sources` settings.
+- **`init -p` always seeds `.skillshare/{skills,agents}/`.** Custom sources take effect only after you edit `config.yaml`.
+
+---
+
 ## Mode Restrictions
 
 Project mode has some intentional limitations:

@@ -24,6 +24,52 @@ skillshare init --source ~/my-skills
 
 ---
 
+### `failed to load project config: ...`
+
+**Cause:** `.skillshare/config.yaml` exists but cannot be parsed (malformed YAML, wrong types, etc.). Mutating commands (`uninstall`, `new`, `enable`/`disable`, `check`) refuse to proceed in this state so they don't accidentally touch the default `.skillshare/skills/` directory when you have a custom `sources` configuration.
+
+**Solution:** Fix the YAML and re-run the command. Common issues:
+
+```yaml
+# WRONG — targets must be a list
+targets: {}
+
+# RIGHT
+targets: []
+```
+
+```yaml
+# WRONG — skills must be a list
+skills: my-skill
+
+# RIGHT
+skills:
+  - name: my-skill
+    source: github.com/org/my-skill
+```
+
+Validate the file with any YAML linter, or temporarily restore from `.skillshare/backups/` if you have one.
+
+---
+
+### `target "<name>": skills target path X overlaps skills source Y`
+
+**Cause:** Your `sources.skills` resolves to the same directory as a target's skills path (or one contains the other). For example, configuring `sources.skills: .claude/skills` together with a `claude` target — both point to `.claude/skills/`. Without this guard, `sync --force` would treat the source as a target directory and delete its contents.
+
+**Solution:** Choose a source path that does not alias any target. Common safe choices:
+
+```yaml
+# Co-locate with project docs
+sources:
+  skills: ./docs/skills
+
+# Keep under .skillshare/ (default — remove the sources key entirely)
+```
+
+The same check applies to `sources.agents` against agent target paths.
+
+---
+
 ## Target Errors
 
 ### `target add: path does not exist`
