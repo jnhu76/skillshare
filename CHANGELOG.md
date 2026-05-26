@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.19.22] - 2026-05-26
+
+### Bug Fixes
+
+- **Web UI install now handles mixed-track repos** — installing a repository that contains both skills and agents with **Track** enabled (for example `github/awesome-copilot`) used to fail with a `tracked install is ambiguous; pass --kind skill or --kind agent` error toast and no way forward. The dashboard now opens a kind picker showing skill and agent counts; choose **Skills** or **Agents** and the install proceeds with the chosen `--kind`. Refs: #167
+
+### Performance
+
+- **One fewer clone when recovering from a mixed-track install** — the install API now reports skill/agent counts in the ambiguity error itself, so the dashboard no longer re-clones the repository via `/api/discover` before showing the kind picker
+
 ## [0.19.21] - 2026-05-24
 
 ### Bug Fixes
