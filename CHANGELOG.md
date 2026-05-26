@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.19.23] - 2026-05-26
+
+### Bug Fixes
+
+- **Nested GitHub-installed skills stop reappearing as updateable after update** — `skillshare update` and the dashboard Update page now refresh the stored metadata for skills installed under a subdirectory, so items such as `tools/agent-browser` no longer keep showing **Update available** immediately after a successful update
+
 ## [0.19.22] - 2026-05-26
 
 ### Bug Fixes
