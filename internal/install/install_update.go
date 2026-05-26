@@ -129,6 +129,11 @@ func handleUpdate(source *Source, destPath string, result *InstallResult, opts I
 		result.Warnings = append(result.Warnings, innerResult.Warnings...)
 	}
 
+	// Preserve metadata generated during the temp install, then write it against
+	// the real destination after the swap. Writing the temp install directly to
+	// opts.SourceDir would create ../../ temp-path keys for nested skills.
+	updatedMeta := readTempUpdateMeta(tempDir)
+
 	// Installation succeeded - now safe to remove original and move new
 	if err := os.RemoveAll(destPath); err != nil {
 		return nil, fmt.Errorf("failed to remove existing skill: %w", err)
@@ -141,8 +146,37 @@ func handleUpdate(source *Source, destPath string, result *InstallResult, opts I
 		}
 	}
 
+	if updatedMeta != nil {
+		if err := WriteMetaToStore(opts.SourceDir, destPath, updatedMeta); err != nil {
+			result.Warnings = append(result.Warnings, fmt.Sprintf("failed to write metadata: %v", err))
+		}
+	}
+
 	result.Action = "reinstalled"
 	return result, nil
+}
+
+func readTempUpdateMeta(tempDir string) *SkillMeta {
+	store, err := LoadMetadata(tempDir)
+	if err != nil {
+		return nil
+	}
+	entry := store.Get("skill")
+	if entry == nil {
+		return nil
+	}
+	return &SkillMeta{
+		Source:      entry.Source,
+		Kind:        entry.Kind,
+		Type:        entry.Type,
+		InstalledAt: entry.InstalledAt,
+		RepoURL:     entry.RepoURL,
+		Subdir:      entry.Subdir,
+		Version:     entry.Version,
+		TreeHash:    entry.TreeHash,
+		FileHashes:  entry.FileHashes,
+		Branch:      entry.Branch,
+	}
 }
 
 func hasDescendantSkillFile(root string) bool {

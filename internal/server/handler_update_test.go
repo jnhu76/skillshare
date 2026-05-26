@@ -86,6 +86,77 @@ func TestUpdateSingle_NotFound(t *testing.T) {
 	}
 }
 
+func TestUpdateRegularSkill_NestedSkillRefreshesRootMetadataStore(t *testing.T) {
+	s, src := newTestServer(t)
+
+	remote := t.TempDir()
+	initGitRepo(t, remote)
+	remoteSkill := filepath.Join(remote, "skills", "agent-browser")
+	if err := os.MkdirAll(remoteSkill, 0755); err != nil {
+		t.Fatalf("create remote skill: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(remoteSkill, "SKILL.md"), []byte("---\nname: agent-browser\n---\n# Agent Browser\n"), 0644); err != nil {
+		t.Fatalf("write remote skill: %v", err)
+	}
+	runGit(t, remote, "add", ".")
+	runGit(t, remote, "commit", "-m", "add skill")
+	latestCommit := strings.TrimSpace(string(runGit(t, remote, "rev-parse", "--short", "HEAD")))
+
+	localSkill := filepath.Join(src, "tools", "agent-browser")
+	if err := os.MkdirAll(localSkill, 0755); err != nil {
+		t.Fatalf("create local skill: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(localSkill, "SKILL.md"), []byte("---\nname: agent-browser\n---\n# Old\n"), 0644); err != nil {
+		t.Fatalf("write local skill: %v", err)
+	}
+
+	store := install.NewMetadataStore()
+	store.Set("tools/agent-browser", &install.MetadataEntry{
+		Source:  "file://" + remote + "//skills/agent-browser",
+		RepoURL: "file://" + remote,
+		Subdir:  "skills/agent-browser",
+		Version: "old-version",
+	})
+	if err := store.Save(src); err != nil {
+		t.Fatalf("save metadata: %v", err)
+	}
+	s.skillsStore = store
+
+	result := s.updateRegularSkill("tools/agent-browser", localSkill, true)
+	if result.Action != "updated" {
+		t.Fatalf("expected updated action, got %q: %s", result.Action, result.Message)
+	}
+
+	rootStore, err := install.LoadMetadata(src)
+	if err != nil {
+		t.Fatalf("load root metadata: %v", err)
+	}
+	entry := rootStore.GetByPath("tools/agent-browser")
+	if entry == nil {
+		t.Fatal("expected root metadata entry for nested skill")
+	}
+	if entry.Version != latestCommit {
+		t.Fatalf("root metadata version = %q, want %q", entry.Version, latestCommit)
+	}
+	if cached := s.skillsStore.GetByPath("tools/agent-browser"); cached == nil || cached.Version != latestCommit {
+		t.Fatalf("server metadata cache was not refreshed, got %#v", cached)
+	}
+	if _, err := os.Stat(filepath.Join(src, "tools", install.MetadataFileName)); !os.IsNotExist(err) {
+		t.Fatalf("expected no nested metadata store, stat err=%v", err)
+	}
+}
+
+func runGit(t *testing.T, dir string, args ...string) []byte {
+	t.Helper()
+	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %v failed: %s %v", args, out, err)
+	}
+	return out
+}
+
 func TestUpdateSingle_RegularSkillPriority(t *testing.T) {
 	s, src := newTestServer(t)
 

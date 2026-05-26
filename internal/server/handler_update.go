@@ -391,11 +391,13 @@ func (s *Server) updateRegularSkill(name, skillPath string, skipAudit bool) upda
 		}
 	}
 
+	sourceDir := s.cfg.EffectiveSkillsSource()
 	opts := install.InstallOptions{
 		Force:          true,
 		Update:         true,
 		SkipAudit:      skipAudit,
 		AuditThreshold: s.updateAuditThreshold(),
+		SourceDir:      sourceDir,
 	}
 	if s.IsProjectMode() {
 		opts.AuditProjectRoot = s.projectRoot
@@ -407,6 +409,10 @@ func (s *Server) updateRegularSkill(name, skillPath string, skipAudit bool) upda
 			Action:  "error",
 			Message: err.Error(),
 		}
+	}
+
+	if st, loadErr := install.LoadMetadataWithMigration(sourceDir, ""); loadErr == nil && st != nil {
+		s.skillsStore = st
 	}
 
 	item := updateResultItem{
