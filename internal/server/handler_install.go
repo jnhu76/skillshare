@@ -2,11 +2,13 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"skillshare/internal/config"
@@ -325,6 +327,16 @@ func (s *Server) handleInstall(w http.ResponseWriter, r *http.Request) {
 	if body.Track {
 		trackedKind, err := install.InferTrackedKind(source, body.Kind)
 		if err != nil {
+			var ambig *install.TrackKindAmbiguousError
+			if errors.As(err, &ambig) {
+				writeCodedError(w, http.StatusBadRequest,
+					"install.track_kind_ambiguous", err.Error(),
+					map[string]string{
+						"skills": strconv.Itoa(ambig.Skills),
+						"agents": strconv.Itoa(ambig.Agents),
+					})
+				return
+			}
 			writeError(w, http.StatusBadRequest, err.Error())
 			return
 		}

@@ -221,9 +221,23 @@ func DiscoverFromGitSubdirWithProgress(source *Source, onProgress ProgressCallba
 	return discoverFromGitSubdirWithProgressImpl(source, onProgress)
 }
 
+// TrackKindAmbiguousError is returned by InferTrackedKind when a tracked
+// install targets a repository that contains both skills and agents and the
+// caller did not pass an explicit kind. It carries the discovered counts so
+// the UI can present a kind picker without re-cloning.
+type TrackKindAmbiguousError struct {
+	Skills int
+	Agents int
+}
+
+func (e *TrackKindAmbiguousError) Error() string {
+	return "tracked install is ambiguous for mixed repositories; pass --kind skill or --kind agent"
+}
+
 // InferTrackedKind determines which resource kind a tracked install should use.
 // Pure-agent repositories resolve to "agent". Mixed repositories must specify
-// the kind explicitly to avoid ambiguous install roots.
+// the kind explicitly to avoid ambiguous install roots; in that case the
+// returned error is a *TrackKindAmbiguousError carrying the discovered counts.
 func InferTrackedKind(source *Source, explicitKind string) (string, error) {
 	if !source.IsGit() {
 		return "", fmt.Errorf("--track requires a git repository source")
@@ -249,7 +263,10 @@ func InferTrackedKind(source *Source, explicitKind string) (string, error) {
 
 	switch {
 	case discovery.HasSkills() && discovery.HasAgents():
-		return "", fmt.Errorf("tracked install is ambiguous for mixed repositories; pass --kind skill or --kind agent")
+		return "", &TrackKindAmbiguousError{
+			Skills: len(discovery.Skills),
+			Agents: len(discovery.Agents),
+		}
 	case discovery.HasAgents() && !discovery.HasSkills():
 		return "agent", nil
 	default:

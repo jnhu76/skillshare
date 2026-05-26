@@ -9,7 +9,7 @@ import SkillPickerModal from './SkillPickerModal';
 import ConfirmDialog from './ConfirmDialog';
 import DialogShell from './DialogShell';
 import { useToast } from './Toast';
-import { api, type InstallResult, type DiscoveredSkill, type DiscoveredAgent } from '../api/client';
+import { api, ApiError, type InstallResult, type DiscoveredSkill, type DiscoveredAgent } from '../api/client';
 import { queryKeys } from '../lib/queryKeys';
 import { clearAuditCache } from '../lib/auditCache';
 import { radius } from '../design';
@@ -97,9 +97,13 @@ interface PendingInstall {
   skipAudit?: boolean;
 }
 
-/** Detect the backend's mixed-tracked-repo ambiguity error */
-function isTrackKindAmbiguous(msg: string): boolean {
-  return msg.includes('tracked install is ambiguous');
+/** Backend error code for a mixed-track-repo ambiguity (see internal/server/handler_install.go). */
+const TRACK_KIND_AMBIGUOUS = 'install.track_kind_ambiguous';
+
+function readCount(params: Record<string, unknown> | undefined, key: string): number {
+  const raw = params?.[key];
+  const n = typeof raw === 'number' ? raw : parseInt(String(raw ?? ''), 10);
+  return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
 function KindOption({
@@ -317,19 +321,16 @@ export default function InstallForm({
         });
         handleResult(res, res.skillName ?? res.repoName);
       } catch (e: unknown) {
-        const msg = (e as Error).message;
-        if (isTrackKindAmbiguous(msg)) {
-          try {
-            const disc = await api.discover(snapshot.source, branchSnapshot);
-            setTrackKindCounts({ skills: disc.skills.length, agents: disc.agents?.length ?? 0 });
-            setPendingSource(snapshot.source);
-            setPendingTrackParams({ ...snapshot, branch: branchSnapshot, force, skipAudit });
-            setKindSelectorMode('track');
-          } catch {
-            // Discover failed after the ambiguous error — surface the
-            // original message so the user knows --kind is the issue.
-            handleError(e, snapshot);
-          }
+        if (e instanceof ApiError && e.code === TRACK_KIND_AMBIGUOUS) {
+          // Backend already discovered counts during its failed first clone
+          // and embedded them in the error params — no second clone needed.
+          setTrackKindCounts({
+            skills: readCount(e.params, 'skills'),
+            agents: readCount(e.params, 'agents'),
+          });
+          setPendingSource(snapshot.source);
+          setPendingTrackParams({ ...snapshot, branch: branchSnapshot, force, skipAudit });
+          setKindSelectorMode('track');
         } else {
           handleError(e, snapshot);
         }
