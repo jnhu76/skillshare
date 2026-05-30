@@ -157,4 +157,4 @@ Use {{args}}
    skillshare sync extras
    ```
 
-For the full extension contract, see [Extension transforms](../website/docs/reference/commands/extras.md#extension-transforms).
+For the full extension contract, see [Extension transforms](https://skillshare.runkids.cc/docs/reference/commands/extras#extension-transforms).
