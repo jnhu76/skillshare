@@ -40,7 +40,7 @@
 </p>
 
 > [!NOTE]
-> **Latest**: [v0.20.1](https://github.com/runkids/skillshare/releases/tag/v0.20.1) — Codex agent transforms now reject blank required fields before generating TOML, and Dashboard Extras sync toasts show the first file-level extension error. [All releases →](https://github.com/runkids/skillshare/releases)
+> **Latest**: [v0.20.0](https://github.com/runkids/skillshare/releases/tag/v0.20.0) — choose what `commit`/`push`/`pull` version with **git_root scope** (skills, agents, extras, or all together in one repo); extras **extension transforms** convert Markdown to native formats (Gemini TOML commands, Codex TOML agents) during sync. [All releases →](https://github.com/runkids/skillshare/releases)
 
 ## Why skillshare
 
