@@ -496,6 +496,8 @@
   "extras.toast.extensionChanged": "extension 已设为「{extension}」（copy 模式）",
   "extras.toast.extensionCleared": "已清除 extension",
   "extras.toast.flattenChanged": "已更新（flatten={flatten}）",
+  "extras.toast.targetAdded": "已添加目标「{path}」",
+  "extras.toast.targetRemoved": "已移除目标「{path}」",
   "extras.toast.modeChanged": "模式已切换为\"{mode}\"",
   "extras.toast.removed": "\"{name}\" 已删除",
   "fileViewer.copyPath": "复制文件路径",

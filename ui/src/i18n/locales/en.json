@@ -572,6 +572,8 @@
   "extras.toast.extensionChanged": "Extension set to \"{extension}\" (copy mode)",
   "extras.toast.extensionCleared": "Extension cleared",
   "extras.toast.flattenChanged": "Updated (flatten={flatten})",
+  "extras.toast.targetAdded": "Target \"{path}\" added",
+  "extras.toast.targetRemoved": "Target \"{path}\" removed",
   "extras.toast.removed": "\"{name}\" removed",
   "extras.toast.syncAll": "All extras synced",
   "extras.toast.syncAllFailed": "Extras sync failed",

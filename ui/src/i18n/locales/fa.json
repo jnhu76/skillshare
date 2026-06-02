@@ -487,6 +487,8 @@
   "extras.toast.extensionChanged": "افزونه روی «{extension}» تنظیم شد (حالت copy)",
   "extras.toast.extensionCleared": "افزونه پاک شد",
   "extras.toast.flattenChanged": "به‌روز شد (flatten={flatten})",
+  "extras.toast.targetAdded": "هدف \"{path}\" اضافه شد",
+  "extras.toast.targetRemoved": "هدف \"{path}\" حذف شد",
   "extras.toast.modeChanged": "حالت به \"{mode}\" تغییر کرد",
   "extras.toast.nErrors": "{errors} خطا",
   "extras.toast.noFilesInSource": "هیچ فایلی در منبع وجود ندارد",

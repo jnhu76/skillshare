@@ -496,6 +496,8 @@
   "extras.toast.extensionChanged": "extension を「{extension}」に設定しました（copy モード）",
   "extras.toast.extensionCleared": "extension をクリアしました",
   "extras.toast.flattenChanged": "更新しました（flatten={flatten}）",
+  "extras.toast.targetAdded": "ターゲット「{path}」を追加しました",
+  "extras.toast.targetRemoved": "ターゲット「{path}」を削除しました",
   "extras.toast.modeChanged": "モードを「{mode}」に変更しました",
   "extras.toast.removed": "「{name}」を削除しました",
   "fileViewer.copyPath": "ファイルパスをコピー",

@@ -496,6 +496,8 @@
   "extras.toast.extensionChanged": "Extension définie sur «{extension}» (mode copy)",
   "extras.toast.extensionCleared": "Extension supprimée",
   "extras.toast.flattenChanged": "Mis à jour (aplatir={flatten})",
+  "extras.toast.targetAdded": "Cible « {path} » ajoutée",
+  "extras.toast.targetRemoved": "Cible « {path} » supprimée",
   "extras.toast.modeChanged": "Mode changé en « {mode} »",
   "extras.toast.removed": "« {name} » supprimé",
   "fileViewer.copyPath": "Copier le chemin du fichier",

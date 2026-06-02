@@ -487,6 +487,8 @@
   "extras.toast.extensionChanged": "extension 已設為「{extension}」（copy 模式）",
   "extras.toast.extensionCleared": "已清除 extension",
   "extras.toast.flattenChanged": "已更新（攤平={flatten}）",
+  "extras.toast.targetAdded": "已新增目標「{path}」",
+  "extras.toast.targetRemoved": "已移除目標「{path}」",
   "extras.toast.modeChanged": "模式已變更為「{mode}」",
   "extras.toast.removed": "「{name}」已移除",
   "extras.toast.syncAll": "全部附加目錄已同步",

@@ -496,6 +496,8 @@
   "extras.toast.extensionChanged": "Extension diatur ke \"{extension}\" (mode copy)",
   "extras.toast.extensionCleared": "Extension dihapus",
   "extras.toast.flattenChanged": "Diperbarui (flatten={flatten})",
+  "extras.toast.targetAdded": "Target \"{path}\" ditambahkan",
+  "extras.toast.targetRemoved": "Target \"{path}\" dihapus",
   "extras.toast.modeChanged": "Mode diubah ke \"{mode}\"",
   "extras.toast.removed": "\"{name}\" dihapus",
   "fileViewer.copyPath": "Salin path file",

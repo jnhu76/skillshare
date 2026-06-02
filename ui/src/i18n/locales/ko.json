@@ -487,6 +487,8 @@
   "extras.toast.extensionChanged": "extension을 \"{extension}\"(으)로 설정했습니다 (copy 모드)",
   "extras.toast.extensionCleared": "extension을 지웠습니다",
   "extras.toast.flattenChanged": "업데이트됨 (flatten={flatten})",
+  "extras.toast.targetAdded": "대상 \"{path}\"이(가) 추가되었습니다",
+  "extras.toast.targetRemoved": "대상 \"{path}\"이(가) 제거되었습니다",
   "extras.toast.modeChanged": "모드가 \"{mode}\"(으)로 변경되었습니다",
   "extras.toast.nErrors": "{errors}개 오류",
   "extras.toast.noFilesInSource": "소스에 파일 없음",
