@@ -283,6 +283,7 @@ Thanks to everyone who helped shape skillshare.
 <a href="https://github.com/PeterTianbuhan"><img src="https://github.com/PeterTianbuhan.png" width="50" style="border-radius:50%" alt="PeterTianbuhan"></a>
 <a href="https://github.com/dotned"><img src="https://github.com/dotned.png" width="50" style="border-radius:50%" alt="dotned"></a>
 <a href="https://github.com/ismferd"><img src="https://github.com/ismferd.png" width="50" style="border-radius:50%" alt="ismferd"></a>
+<a href="https://github.com/jblackburn21"><img src="https://github.com/jblackburn21.png" width="50" style="border-radius:50%" alt="jblackburn21"></a>
 
 ---
 
