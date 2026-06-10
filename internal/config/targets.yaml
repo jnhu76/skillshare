@@ -131,6 +131,10 @@ targets:
     skills:
       global: "~/.factory/skills"
       project: ".factory/skills"
+    agents:
+      global: "~/.factory/droids"
+      project: ".factory/droids"
+    aliases: [factory]
   - name: firebender
     skills:
       global: "~/.firebender/skills"
