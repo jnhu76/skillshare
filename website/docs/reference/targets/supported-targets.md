@@ -180,6 +180,7 @@ Some targets have alternative names for backward compatibility or convenience:
 | `command-code` | `commandcode` | Hyphenated variant |
 | `devin-terminal` | `devin` | With terminal suffix |
 | `deep-agents` | `deepagents` | Hyphenated variant |
+| `factory` | `droid` | Brand / config dir name |
 | `forge-code` | `forgecode` | Hyphenated variant |
 | `gemini` | `antigravity` | Legacy name (Gemini CLI → Antigravity) |
 | `gemini-cli` | `antigravity` | Legacy name |

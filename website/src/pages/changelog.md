@@ -9,6 +9,21 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.20.12] - 2026-06-11
+
+### New Features
+
+- **Droid syncs custom droids as agents** — the `droid` target now distributes custom droids (`.md` files with YAML frontmatter) alongside skills, mapping them to `~/.factory/droids` (global) and `.factory/droids` (project) through the existing agents sync. The target also accepts `factory` as an alias:
+  ```bash
+  skillshare target add factory   # same as: skillshare target add droid
+  skillshare sync agents
+  ```
+  Refs: #213.
+
+### Bug Fixes
+
+- **Project-mode agent symlinks are now relative** — `skillshare sync agents` created absolute symlinks in project mode, which broke when the repository was moved or checked out on another machine. Agent symlinks now use relative paths, matching how project skill symlinks already work.
+
 ## [0.20.11] - 2026-06-10
 
 ### Bug Fixes
