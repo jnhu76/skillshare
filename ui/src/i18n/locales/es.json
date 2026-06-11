@@ -366,6 +366,7 @@
   "dashboard.toast.updateBlockedFor": "Actualización bloqueada para {name}",
   "dashboard.toast.updateComplete": "Actualización completa: {summary}.",
   "dashboard.toast.updateFailedFor": "Error al actualizar {name}",
+  "dashboard.toast.missingTrackedRepos": "Faltan {count} repo(s) rastreado(s) en el disco: abre Updates para rehidratar",
   "dashboard.trackedRepos.clean": "sin cambios",
   "dashboard.trackedRepos.modified": "modificado",
   "dashboard.trackedRepos.skillCount": "{count} skills",

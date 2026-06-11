@@ -366,6 +366,7 @@
   "dashboard.toast.updateBlockedFor": "به‌روزرسانی برای {name} مسدود شد",
   "dashboard.toast.updateComplete": "به‌روزرسانی کامل شد: {summary}.",
   "dashboard.toast.updateFailedFor": "به‌روزرسانی برای {name} ناموفق بود",
+  "dashboard.toast.missingTrackedRepos": "{count} مخزن ردیابی‌شده روی دیسک وجود ندارد — برای rehydrate صفحهٔ Updates را باز کنید",
   "dashboard.trackedRepos.clean": "تمیز",
   "dashboard.trackedRepos.modified": "تغییر یافته",
   "dashboard.trackedRepos.skillCount": "{count} اسکیل",

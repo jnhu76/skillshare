@@ -366,6 +366,7 @@
   "dashboard.toast.updateBlockedFor": "{name} 업데이트 차단됨",
   "dashboard.toast.updateComplete": "업데이트 완료: {summary}.",
   "dashboard.toast.updateFailedFor": "{name} 업데이트 실패",
+  "dashboard.toast.missingTrackedRepos": "{count}개의 tracked 저장소가 디스크에 없습니다 — Updates 페이지에서 rehydrate하세요",
   "dashboard.trackedRepos.clean": "깨끗함",
   "dashboard.trackedRepos.modified": "수정됨",
   "dashboard.trackedRepos.skillCount": "{count}개 skills",

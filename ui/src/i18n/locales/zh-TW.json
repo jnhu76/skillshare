@@ -366,6 +366,7 @@
   "dashboard.toast.updateBlockedFor": "{name} 的更新被封鎖",
   "dashboard.toast.updateComplete": "更新完成：{summary}。",
   "dashboard.toast.updateFailedFor": "{name} 的更新失敗",
+  "dashboard.toast.missingTrackedRepos": "{count} 個 tracked repo 在磁碟上遺失 — 前往 Updates 頁面 rehydrate",
   "dashboard.trackedRepos.clean": "乾淨",
   "dashboard.trackedRepos.modified": "已修改",
   "dashboard.trackedRepos.skillCount": "{count} 個 skills",

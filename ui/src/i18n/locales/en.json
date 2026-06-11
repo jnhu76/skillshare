@@ -317,6 +317,7 @@
   "dashboard.toast.updateBlockedFor": "Update blocked for {name}",
   "dashboard.toast.updateComplete": "Update complete: {summary}.",
   "dashboard.toast.updateFailedFor": "Update failed for {name}",
+  "dashboard.toast.missingTrackedRepos": "{count} tracked repo(s) missing on disk — open Updates to rehydrate",
   "dashboard.trackedRepos.clean": "clean",
   "dashboard.trackedRepos.modified": "modified",
   "dashboard.trackedRepos.skillCount": "{count} skills",

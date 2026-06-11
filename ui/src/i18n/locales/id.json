@@ -366,6 +366,7 @@
   "dashboard.toast.updateBlockedFor": "Pembaruan diblokir untuk {name}",
   "dashboard.toast.updateComplete": "Pembaruan selesai: {summary}.",
   "dashboard.toast.updateFailedFor": "Pembaruan gagal untuk {name}",
+  "dashboard.toast.missingTrackedRepos": "{count} repo terlacak hilang di disk — buka Updates untuk rehydrate",
   "dashboard.trackedRepos.clean": "bersih",
   "dashboard.trackedRepos.modified": "dimodifikasi",
   "dashboard.trackedRepos.skillCount": "{count} skill",

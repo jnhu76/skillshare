@@ -366,6 +366,7 @@
   "dashboard.toast.updateBlockedFor": "{name} の更新がブロックされました",
   "dashboard.toast.updateComplete": "更新完了: {summary}。",
   "dashboard.toast.updateFailedFor": "{name} の更新に失敗しました",
+  "dashboard.toast.missingTrackedRepos": "{count} 件の tracked リポジトリがディスク上に見つかりません — Updates ページで rehydrate してください",
   "dashboard.trackedRepos.clean": "クリーン",
   "dashboard.trackedRepos.modified": "変更あり",
   "dashboard.trackedRepos.skillCount": "{count} 件のスキル",

@@ -383,7 +383,7 @@ export const api = {
 
   // Update
   update: (opts: { name?: string; kind?: 'skill' | 'agent'; force?: boolean; all?: boolean; skipAudit?: boolean }) =>
-    apiFetch<{ results: UpdateResultItem[] }>('/update', {
+    apiFetch<{ results: UpdateResultItem[]; missingTrackedRepos?: MissingTrackedRepo[] }>('/update', {
       method: 'POST',
       body: JSON.stringify(opts),
     }),
