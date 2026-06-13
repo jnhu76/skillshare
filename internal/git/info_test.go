@@ -107,6 +107,25 @@ func TestStageAndCommit(t *testing.T) {
 	}
 }
 
+func TestCommit_TokenNotInError(t *testing.T) {
+	repo := initTestRepo(t)
+	t.Setenv("GITHUB_TOKEN", "ghp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
+	// repo has initial commit, nothing staged → git commit will fail
+	err := Commit(repo, "test")
+	if err == nil {
+		t.Fatal("expected error from commit on clean repo")
+	}
+
+	token := "ghp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	if strings.Contains(err.Error(), token) {
+		t.Errorf("token leaked in error message: %v", err)
+	}
+	if strings.HasPrefix(err.Error(), "git commit failed:") {
+		t.Errorf("error was not sanitized through WrapGitError: %v", err)
+	}
+}
+
 func TestGetStatus(t *testing.T) {
 	repo := initTestRepo(t)
 

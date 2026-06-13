@@ -476,9 +476,11 @@ func StageAll(dir string) error {
 func Commit(dir, msg string) error {
 	cmd := exec.Command("git", "commit", "-m", msg)
 	cmd.Dir = dir
-	out, err := cmd.CombinedOutput()
+	var stderrBuf bytes.Buffer
+	cmd.Stderr = &stderrBuf
+	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("git commit failed: %s", strings.TrimSpace(string(out)))
+		return install.WrapGitError(stderrBuf.String(), err, false)
 	}
 	return nil
 }
