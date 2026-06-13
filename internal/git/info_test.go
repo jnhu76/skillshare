@@ -124,6 +124,13 @@ func TestCommit_TokenNotInError(t *testing.T) {
 	if strings.HasPrefix(err.Error(), "git commit failed:") {
 		t.Errorf("error was not sanitized through WrapGitError: %v", err)
 	}
+	// "nothing to commit" is git's most common Commit failure and is
+	// written to stdout (not stderr). Verify the diagnostic survives the
+	// stdout+stderr capture so callers (HTTP handlers) still see why the
+	// commit failed instead of a generic exit-code message.
+	if !strings.Contains(err.Error(), "nothing to commit") {
+		t.Errorf("expected diagnostic 'nothing to commit' in error, got: %v", err)
+	}
 }
 
 func TestGetStatus(t *testing.T) {

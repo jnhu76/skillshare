@@ -472,15 +472,20 @@ func StageAll(dir string) error {
 	return cmd.Run()
 }
 
-// Commit creates a commit with the given message
+// Commit creates a commit with the given message.
+// Both stdout and stderr are captured because git commit writes diagnostic
+// messages like "nothing to commit, working tree clean" to stdout, while
+// errors like "fatal: not a git repository" go to stderr. Both are routed
+// through install.WrapGitError so any token-bearing content is sanitized.
 func Commit(dir, msg string) error {
 	cmd := exec.Command("git", "commit", "-m", msg)
 	cmd.Dir = dir
-	var stderrBuf bytes.Buffer
-	cmd.Stderr = &stderrBuf
+	var outBuf bytes.Buffer
+	cmd.Stdout = &outBuf
+	cmd.Stderr = &outBuf
 	err := cmd.Run()
 	if err != nil {
-		return install.WrapGitError(stderrBuf.String(), err, false)
+		return install.WrapGitError(outBuf.String(), err, false)
 	}
 	return nil
 }
