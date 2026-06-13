@@ -495,16 +495,18 @@ func PushRemoteWithAuth(dir string) error {
 }
 
 // PushRemoteWithEnv pushes to the default remote with additional environment
-// variables.
+// variables. Error output is sanitized of credential values via WrapGitError.
 func PushRemoteWithEnv(dir string, extraEnv []string) error {
 	cmd := exec.Command("git", "push")
 	cmd.Dir = dir
 	if len(extraEnv) > 0 {
 		cmd.Env = append(os.Environ(), extraEnv...)
 	}
-	out, err := cmd.CombinedOutput()
+	var stderrBuf bytes.Buffer
+	cmd.Stderr = &stderrBuf
+	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("git push failed: %s", strings.TrimSpace(string(out)))
+		return install.WrapGitError(stderrBuf.String(), err, install.UsedTokenAuth(extraEnv))
 	}
 	return nil
 }

@@ -39,6 +39,38 @@ func initTestRepo(t *testing.T) string {
 	return dir
 }
 
+func TestPushRemoteWithEnv_TokenNotInError(t *testing.T) {
+	repo := initTestRepo(t)
+	token := "ghp_test_token_12345_redact"
+	t.Setenv("GITHUB_TOKEN", token)
+
+	addRemote(t, repo, "https://host.invalid/org/repo.git")
+
+	// Configure upstream directly so git push actually attempts a connection.
+	exec.Command("git", "-C", repo, "config", "branch.master.remote", "origin").Run()
+	exec.Command("git", "-C", repo, "config", "branch.master.merge", "refs/heads/master").Run()
+
+	// Push will fail — host.invalid never resolves (RFC 2606).
+	// The fix switches from fmt.Errorf("git push failed: %s", out) to
+	// install.WrapGitError(stderr, err, usedToken). This ensures error
+	// output is sanitized of credential values AND processed through
+	// extractGitFatal (which strips "fatal:" prefix).
+	//
+	// Before fix: "git push failed: fatal: unable to access 'https://..."
+	// After fix:  "unable to access 'https://..."  (no "fatal:" prefix)
+	err := PushRemoteWithEnv(repo, nil)
+	if err == nil {
+		t.Fatal("expected error from push to non-existent host.invalid")
+	}
+	msg := err.Error()
+	if strings.Contains(msg, token) {
+		t.Errorf("token value leaked in error message:\n%s", msg)
+	}
+	if strings.HasPrefix(msg, "git push failed:") {
+		t.Errorf("error was not processed through WrapGitError (raw output):\n%s", msg)
+	}
+}
+
 func TestIsRepo(t *testing.T) {
 	repo := initTestRepo(t)
 	if !IsRepo(repo) {
