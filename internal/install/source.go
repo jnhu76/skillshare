@@ -209,6 +209,11 @@ func expandGitHubShorthand(input string) string {
 		}
 	}
 
+	// GitHub CLI shorthand: gh:owner[/repo][/subdir]
+	if strings.HasPrefix(input, "gh:") {
+		return "github.com/" + input[3:]
+	}
+
 	// Skip if already has a known prefix
 	if strings.HasPrefix(input, "github.com/") ||
 		strings.HasPrefix(input, "http://") ||

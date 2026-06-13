@@ -1310,6 +1310,63 @@ func TestParseSource_GitHubShorthandExpansion(t *testing.T) {
 	}
 }
 
+func TestParseSource_GitHubColonPrefix(t *testing.T) {
+	tests := []struct {
+		name         string
+		input        string
+		wantCloneURL string
+		wantSubdir   string
+		wantName     string
+		wantErr      bool
+	}{
+		{
+			name:         "gh:owner/repo expands to GitHub",
+			input:        "gh:owner/repo",
+			wantCloneURL: "https://github.com/owner/repo.git",
+			wantSubdir:   "",
+			wantName:     "repo",
+		},
+		{
+			name:         "gh:owner/repo/subdir expands to GitHub with subdir",
+			input:        "gh:owner/repo/skills/foo",
+			wantCloneURL: "https://github.com/owner/repo.git",
+			wantSubdir:   "skills/foo",
+			wantName:     "foo",
+		},
+		{
+			name:         "gh:owner/repo.git expands to GitHub with .git",
+			input:        "gh:owner/repo.git",
+			wantCloneURL: "https://github.com/owner/repo.git",
+			wantSubdir:   "",
+			wantName:     "repo",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			source, err := ParseSource(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ParseSource(%q) err = %v, wantErr = %v", tt.input, err, tt.wantErr)
+			}
+			if err != nil {
+				return
+			}
+			if source.Type != SourceTypeGitHub {
+				t.Errorf("Type = %v, want %v", source.Type, SourceTypeGitHub)
+			}
+			if source.CloneURL != tt.wantCloneURL {
+				t.Errorf("CloneURL = %q, want %q", source.CloneURL, tt.wantCloneURL)
+			}
+			if source.Subdir != tt.wantSubdir {
+				t.Errorf("Subdir = %q, want %q", source.Subdir, tt.wantSubdir)
+			}
+			if source.Name != tt.wantName {
+				t.Errorf("Name = %q, want %q", source.Name, tt.wantName)
+			}
+		})
+	}
+}
+
 func TestParseSource_AzureDevOps(t *testing.T) {
 	tests := []struct {
 		name         string
