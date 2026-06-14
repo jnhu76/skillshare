@@ -164,7 +164,7 @@ func ShallowCloneToTemp(cloneURL, branch string) (string, error) {
 		return "", err
 	}
 	if err := cloneRepo(cloneURL, dir, branch, true, nil); err != nil {
-		os.RemoveAll(dir)
+		cleanupTempRepo(dir)
 		return "", err
 	}
 	return dir, nil
