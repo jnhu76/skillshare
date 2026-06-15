@@ -197,10 +197,14 @@ func TestMetadataStore_SaveAndLoad(t *testing.T) {
 		t.Fatalf("Save failed: %v", err)
 	}
 
-	// Verify file exists
+	// Verify file exists with repository-friendly permissions.
 	metaPath := filepath.Join(dir, MetadataFileName)
-	if _, err := os.Stat(metaPath); err != nil {
+	info, err := os.Stat(metaPath)
+	if err != nil {
 		t.Fatalf("metadata file not created: %v", err)
+	}
+	if got, want := info.Mode().Perm(), os.FileMode(0644); got != want {
+		t.Fatalf("metadata file mode = %v, want %v", got, want)
 	}
 
 	// Load and verify round-trip
