@@ -81,6 +81,13 @@ func TestMetadataStore_GetMissing(t *testing.T) {
 	}
 }
 
+func TestMetadataStore_GetByPath_NilStore(t *testing.T) {
+	var s *MetadataStore // load failure can leave a nil store
+	if got := s.GetByPath("any/skill"); got != nil {
+		t.Errorf("GetByPath on nil store = %v, want nil (must not panic)", got)
+	}
+}
+
 func TestMetadataStore_Has(t *testing.T) {
 	s := NewMetadataStore()
 	s.Set("present", &MetadataEntry{Source: "org/repo"})

@@ -80,6 +80,9 @@ func (s *MetadataStore) Has(name string) bool {
 // It first tries a direct key lookup, then falls back to matching group+basename.
 // This handles the case where entries are stored with basename keys but have a Group field.
 func (s *MetadataStore) GetByPath(relPath string) *MetadataEntry {
+	if s == nil {
+		return nil
+	}
 	// Direct lookup (works for top-level skills where key == relPath)
 	if e := s.Entries[relPath]; e != nil {
 		return e

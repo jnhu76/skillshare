@@ -219,7 +219,10 @@ func cmdUpdate(args []string) error {
 		// Recursive discovery for --all
 		scanSpinner := ui.StartSpinner("Scanning skills...")
 		walkRoot := sourcePath
-		metaStore, _ := install.LoadMetadataWithMigration(sourcePath, "")
+		metaStore, metaErr := install.LoadMetadataWithMigration(sourcePath, "")
+		if metaErr != nil {
+			resolveWarnings = append(resolveWarnings, fmt.Sprintf("could not read skill metadata: %v", metaErr))
+		}
 		err := filepath.Walk(walkRoot, func(path string, info os.FileInfo, err error) error {
 			if err != nil || path == walkRoot {
 				return nil
