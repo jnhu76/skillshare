@@ -146,6 +146,53 @@ func TestSecurity_ParseSource_SEC003_RejectsTooDeeplyEncodedTraversal(t *testing
 	}
 }
 
+// SEC003: Each parser branch must reject unsafe repo subdirs.
+func TestSecurity_ParseSource_SEC003_RejectsUnsafeSubdirAcrossParserBranches(t *testing.T) {
+	unsafeCases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "git ssh scp-style",
+			input: "git@example.com:owner/repo.git//../etc/passwd",
+		},
+		{
+			name:  "ssh url",
+			input: "ssh://git@example.com/owner/repo.git//../etc/passwd",
+		},
+		{
+			name:  "file url",
+			input: "file:///tmp/repo//../etc/passwd",
+		},
+		{
+			name:  "azure devops https",
+			input: "https://dev.azure.com/org/project/_git/repo/../etc/passwd",
+		},
+		{
+			name:  "azure devops ssh",
+			input: "git@ssh.dev.azure.com:v3/org/project/repo//../etc/passwd",
+		},
+		{
+			name:  "generic https git suffix",
+			input: "https://git.example.com/owner/repo.git/../etc/passwd",
+		},
+		{
+			name:  "generic https encoded traversal",
+			input: "https://git.example.com/owner/repo/%2e%2e/etc/passwd",
+		},
+	}
+
+	for _, tc := range unsafeCases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := ParseSourceWithOptions(tc.input, ParseOptions{})
+			if err == nil {
+				t.Fatalf("expected error for unsafe subdir, input=%s", tc.input)
+			}
+			t.Logf("correctly rejected: input=%s err=%v", tc.input, err)
+		})
+	}
+}
+
 // SEC003: Versioned subdirs with dots are not affected
 func TestSecurity_ParseSource_SEC003_AllowsVersionedSubdir(t *testing.T) {
 	safeCases := []struct {
