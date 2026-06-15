@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.20.15] - 2026-06-14
+
+### Bug Fixes
+
+- **Git branch refreshes now fail visibly when fetch fails** — the dashboard no longer serves stale remote branches or continues a checkout after `git fetch` fails. Branch listing and checkout requests now report the fetch failure so users can fix connectivity, authentication, or remote problems before switching branches.
+- **Source URL edits keep metadata and remotes in sync** — updating a tracked skill or agent source now updates the Git remote before saving metadata. If the remote update fails, the API returns an error and leaves the existing source metadata unchanged instead of reporting success with an old on-disk remote.
+- **Target removal preserves config when cleanup fails** — removing a target from the dashboard now stops if Skillshare cannot inspect the target, remove the target symlink, remove the target manifest, or clean managed symlinks. The target remains configured so users can fix the filesystem issue and retry instead of losing the target entry.
+- **Version checks handle release tag formats correctly** — update checks now accept versions with a leading `v` prefix while still rejecting malformed version segments. Local metadata builds only advertise a release version when built from a clean exact tag; non-release builds stay in `dev` mode so update checks do not compare against commit-describe strings.
+- **JSON-mode automation stays clean during cleanup warnings** — temporary Git clone cleanup failures are still logged for human-readable flows, but cleanup warnings no longer leak into `--json` stderr output.
+- **Skill linting reports rule load failures instead of panicking** — malformed embedded lint rules now return explicit errors through analysis/discovery paths, and repeated lint runs keep the load error instead of losing it after the first attempt.
+- **Audit finding severity dots are vertically centered** — severity indicators in the dashboard Audit findings list now align with their badges and messages.
+
 ## [0.20.14] - 2026-06-13
 
 ### Bug Fixes

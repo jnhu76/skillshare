@@ -37,6 +37,8 @@ type targetItem struct {
 	AgentExpectedCount *int     `json:"agentExpectedCount,omitempty"`
 }
 
+var removeTargetPath = os.Remove
+
 func (s *Server) handleListTargets(w http.ResponseWriter, r *http.Request) {
 	// Snapshot config under RLock, then release before I/O.
 	s.mu.RLock()
@@ -267,13 +269,25 @@ func (s *Server) handleRemoveTarget(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		if info.Mode()&os.ModeSymlink != 0 {
 			// Symlink mode: entire directory is a symlink
-			os.Remove(sc.Path)
+			if err := removeTargetPath(sc.Path); err != nil {
+				writeError(w, http.StatusInternalServerError, "failed to remove target symlink: "+err.Error())
+				return
+			}
 		} else if info.IsDir() {
 			// Remove manifest if present (merge/copy mode)
-			ssync.RemoveManifest(sc.Path)
+			if err := ssync.RemoveManifest(sc.Path); err != nil {
+				writeError(w, http.StatusInternalServerError, "failed to remove target manifest: "+err.Error())
+				return
+			}
 			// Merge mode: remove individual skill symlinks pointing to source
-			s.unlinkMergeSymlinks(sc.Path)
+			if err := s.unlinkMergeSymlinks(sc.Path); err != nil {
+				writeError(w, http.StatusInternalServerError, "failed to clean target symlinks: "+err.Error())
+				return
+			}
 		}
+	} else if !os.IsNotExist(err) {
+		writeError(w, http.StatusInternalServerError, "failed to inspect target: "+err.Error())
+		return
 	}
 
 	delete(s.cfg.Targets, name)
@@ -449,15 +463,15 @@ func (s *Server) handleUpdateTarget(w http.ResponseWriter, r *http.Request) {
 
 // unlinkMergeSymlinks removes symlinks in targetPath that point under the
 // source directory and copies the skill contents back as real files.
-func (s *Server) unlinkMergeSymlinks(targetPath string) {
+func (s *Server) unlinkMergeSymlinks(targetPath string) error {
 	entries, err := os.ReadDir(targetPath)
 	if err != nil {
-		return
+		return err
 	}
 
 	absSource, err := filepath.Abs(s.cfg.EffectiveSkillsSource())
 	if err != nil {
-		return
+		return err
 	}
 	absSourcePrefix := absSource + string(filepath.Separator)
 
@@ -478,13 +492,16 @@ func (s *Server) unlinkMergeSymlinks(targetPath string) {
 		}
 
 		// Remove symlink and copy the skill back if source still exists
-		if err := os.Remove(skillPath); err != nil {
-			continue
+		if err := removeTargetPath(skillPath); err != nil {
+			return fmt.Errorf("remove %s: %w", skillPath, err)
 		}
 		if _, statErr := os.Stat(absLink); statErr == nil {
-			_ = copySkillDir(absLink, skillPath)
+			if err := copySkillDir(absLink, skillPath); err != nil {
+				return fmt.Errorf("restore %s from %s: %w", skillPath, absLink, err)
+			}
 		}
 	}
+	return nil
 }
 
 // copySkillDir copies a directory tree from src to dst.
