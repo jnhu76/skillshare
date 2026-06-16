@@ -9,6 +9,13 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.20.18] - 2026-06-16
+
+### Bug Fixes
+
+- **Dashboard project-root installs are rejected before copying into themselves** — the web dashboard now rejects project-mode installs where the local source resolves to the project root, matching `skillshare install ./ -p` and returning the same "install a specific skill subdirectory" guidance instead of recursively copying `.skillshare/skills` into itself.
+- **Trash operations reject traversal-style names** — moving skills or agents to trash, restoring from trash, and automatic trash cleanup now validate trash-relative names and destination paths before filesystem writes or removals. Traversal segments, absolute paths, backslashes, NUL-containing names, and empty names are rejected while safe nested names like `org/team-skill` and `demo/my-agent` continue to work.
+
 ## [0.20.17] - 2026-06-15
 
 ### Bug Fixes
